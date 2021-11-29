@@ -87,6 +87,8 @@ class RRTGraph:
         self.path = []
         self.goal_flag = False
 
+        self.neighbor = 50
+
     def make_random_rect(self):
         uppercornerx = int(random.uniform(0, self.map_w - self.obs_dim))
         uppercornery = int(random.uniform(0, self.map_h - self.obs_dim))
@@ -264,6 +266,27 @@ class RRTGraph:
         self.connect(nnear, _n)
         return self.x, self.y, self.parent
 
+    def optimize_edges(self):
+        n = self.number_of_nodes() - 1  # cantidad de nodos
+        neighbor_node_list = []
+        for i in range(0, n):
+            if self.distance(i, n) < self.neighbor:
+                neighbor_node_list.append(i)
+        min_index = neighbor_node_list.index(min(neighbor_node_list))
+        del neighbor_node_list[min_index]
+
+        cost_new_node = self.cost(n)
+        for i in neighbor_node_list:
+            (_x1, _y1) = (self.x[n], self.y[n])
+            (_x2, _y2) = (self.x[i], self.y[i])
+            if not self.cross_obstacle(_x1, _x2, _y1, _y2):
+                last_cost = self.cost(i)
+                temp_cost = cost_new_node + self.distance(n, i)
+                if temp_cost < last_cost:
+                    self.remove_edge(i)
+                    self.add_edge(n, i)
+        return self.x, self.y, self.parent
+
     def expand(self):
         """expands nodes
 
@@ -279,5 +302,15 @@ class RRTGraph:
             self.connect(xnearest, _n)
         return self.x, self.y, self.parent
 
-    def cost(self):
+    def cost(self, n):
         """computes cost for different obtained paths"""
+        ninit = 0
+        n = n
+        parent = self.parent[n]
+        c = 0
+        while n is not ninit:
+            c = c + self.distance(n, parent)
+            n = parent
+            if n is not ninit:
+                parent = self.parent[n]
+        return c

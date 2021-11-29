@@ -19,37 +19,34 @@ def main():
 
     obstacles = graph.make_obs()
 
-    map.draw_map(obstacles)
-
     while not graph.path_to_goal():
+
+        map.map.fill((map.white_color))
+
         elapsed = time.time() - t1
         t1 = time.time()
         if elapsed > 10:
             raise
 
-        if iteration % 10 == 0:
-            X, Y, PARENT = graph.bias(goal)
+        map.draw_map(obstacles)
 
-            pygame.draw.circle(
-                map.map, map.grey_color, (X[-1], Y[-1]), map.node_rad + 2, 0
-            )
-            pygame.draw.line(
-                map.map,
-                map.blue_color,
-                (X[-1], Y[-1]),
-                (X[PARENT[-1]], Y[PARENT[-1]]),
-                map.edge_thickness,
-            )
+        if iteration % 10 == 0:
+            graph.bias(goal)
+
         else:
-            X, Y, PARENT = graph.expand()
+            graph.expand()
+
+        X, Y, PARENT = graph.optimize_edges()
+
+        for i in range(0, len(X)):
             pygame.draw.circle(
-                map.map, map.grey_color, (X[-1], Y[-1]), map.node_rad + 2, 0
+                map.map, map.grey_color, (X[i], Y[i]), map.node_rad + 2, 0
             )
             pygame.draw.line(
                 map.map,
                 map.blue_color,
-                (X[-1], Y[-1]),
-                (X[PARENT[-1]], Y[PARENT[-1]]),
+                (X[i], Y[i]),
+                (X[PARENT[i]], Y[PARENT[i]]),
                 map.edge_thickness,
             )
 
