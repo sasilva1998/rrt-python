@@ -5,8 +5,8 @@ import time
 
 def main():
     dimensions = (600, 1000)
-    start = (50, 50)
-    goal = (510, 510)
+    goal = (50, 50)
+    start = (510, 510)
     obs_dim = 50
     obs_num = 50
 
@@ -19,18 +19,18 @@ def main():
 
     obstacles = graph.make_obs()
 
-    while not graph.path_to_goal():
+    while iteration < 10000:
 
         map.map.fill((map.white_color))
 
         elapsed = time.time() - t1
         t1 = time.time()
         if elapsed > 10:
-            raise
+            raise ("timed up")
 
         map.draw_map(obstacles)
 
-        if iteration % 10 == 0:
+        if iteration % 10 == 0 and not graph.path_to_goal():
             graph.bias(goal)
 
         else:
@@ -50,10 +50,13 @@ def main():
                 map.edge_thickness,
             )
 
+        if graph.path_to_goal():
+            map.draw_path(graph.get_path_coords())
+
         pygame.display.update()
         iteration += 1
-        # time.sleep(1)
-    map.draw_path(graph.get_path_coords())
+        # time.sleep(0.1)
+
     pygame.display.update()
     pygame.event.clear()
     pygame.event.wait(0)

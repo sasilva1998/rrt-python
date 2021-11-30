@@ -52,7 +52,19 @@ class RRTMap:
 
     def draw_path(self, path):
         for node in path:
-            pygame.draw.circle(self.map, self.red_color, node, self.node_rad + 3, 0)
+            pygame.draw.circle(self.map, self.red_color, node, self.node_rad + 5, 0)
+
+        try:
+            for i in range(0, len(path) - 1):
+                pygame.draw.line(
+                    self.map,
+                    self.red_color,
+                    (path[i][0], path[i][1]),
+                    (path[i + 1][0], path[i + 1][1]),
+                    self.edge_thickness + 4,
+                )
+        except Exception as e:
+            print(e)
 
     def draw_obs(self, obstacles):
         obstacles_list = obstacles.copy()
@@ -87,7 +99,10 @@ class RRTGraph:
         self.path = []
         self.goal_flag = False
 
-        self.neighbor = 50
+        self.neighbor = 100
+        self.step_size = 10
+
+        self.first_path_cost = 0
 
     def make_random_rect(self):
         uppercornerx = int(random.uniform(0, self.map_w - self.obs_dim))
@@ -204,7 +219,7 @@ class RRTGraph:
         self.add_edge(_n1, _n2)
         return True
 
-    def step(self, nnear, nrand, d_max=35):
+    def step(self, nnear, nrand):
         """computes the step in direction to the node generated
 
         Args:
@@ -212,6 +227,7 @@ class RRTGraph:
             nrand (int): node number random
             d_max (int, optional): step size to directed node. Defaults to 35.
         """
+        d_max = self.step_size
         _d = self.distance(nnear, nrand)
         if _d > d_max:
             _u = d_max / _d
@@ -240,7 +256,28 @@ class RRTGraph:
                 self.path.append(new_pos)
                 new_pos = self.parent[new_pos]
             self.path.append(0)
+            self.data_resume(self.goal_state)
         return self.goal_flag
+
+    def data_resume(self, goal_node):
+        if self.first_path_cost == 0:
+            self.first_path_cost = self.cost(goal_node)
+        else:
+            last_cost = self.cost(goal_node)
+            print(
+                "first cost: "
+                + str(self.first_path_cost)
+                + " | last cost: "
+                + str(last_cost)
+                + " | cost difference: "
+                + str(self.first_path_cost - last_cost)
+                + " | percentage: "
+                + str(
+                    int((self.first_path_cost - last_cost) / self.first_path_cost * 100)
+                )
+                + " | number of nodes: "
+                + str(self.number_of_nodes())
+            )
 
     def get_path_coords(self):
         """returns the coordinates of the defined path"""
