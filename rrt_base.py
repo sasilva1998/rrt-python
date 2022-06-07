@@ -100,7 +100,7 @@ class RRTGraph:
         self.goal_flag = False
 
         self.neighbor = 100
-        self.step_size = 10
+        self.step_size = 50
 
         self.first_path_cost = 0
 

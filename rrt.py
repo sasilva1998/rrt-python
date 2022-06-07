@@ -55,7 +55,7 @@ def main():
 
         pygame.display.update()
         iteration += 1
-        # time.sleep(0.1)
+        time.sleep(0.05)
 
     pygame.display.update()
     pygame.event.clear()
