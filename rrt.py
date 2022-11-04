@@ -19,14 +19,17 @@ def main():
 
     obstacles = graph.make_obs()
 
+    elapsed = 0
+
     while iteration < 10000:
 
         map.map.fill((map.white_color))
 
-        elapsed = time.time() - t1
+        elapsed = elapsed + (time.time() - t1)
         t1 = time.time()
-        if elapsed > 10:
-            raise ("timed up")
+        if elapsed > 20:
+            print("timed up")
+            raise
 
         map.draw_map(obstacles)
 
@@ -55,7 +58,7 @@ def main():
 
         pygame.display.update()
         iteration += 1
-        time.sleep(0.05)
+        # time.sleep(0.05)
 
     pygame.display.update()
     pygame.event.clear()
