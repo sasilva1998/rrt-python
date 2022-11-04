@@ -21,10 +21,15 @@ def main():
 
     map.draw_map(obstacles)
 
+    elapsed = 0
+
     while not graph.path_to_goal():
-        elapsed = time.time() - t1
+        elapsed = elapsed + (time.time() - t1)
         t1 = time.time()
-        if elapsed > 10:
+
+        if elapsed > 0.2:
+            print("=====No solution found========")
+            print("ELAPSED TIME: ", elapsed)
             raise
 
         if iteration % 10 == 0:
